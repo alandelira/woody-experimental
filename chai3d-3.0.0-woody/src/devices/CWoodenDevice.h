@@ -96,19 +96,32 @@ struct woodenhaptics_message {
 
 
 
+// struct hid_to_pc_message { // 4*2 = 8 bytes
+//     short encoder_a;
+//     short encoder_b;
+//     short encoder_c;
+//     short debug;
+// };
 struct hid_to_pc_message { // 4*2 = 8 bytes
-    short encoder_a;
-    short encoder_b;
-    short encoder_c;
-    short debug;
+    int encoder_a;
+    int encoder_b;
+    int encoder_c;
+    unsigned int debug;
 };
+
 
 struct pc_to_hid_message {  // 4*2 = 8 bytes
     short current_motor_a_mA;
     short current_motor_b_mA;
     short current_motor_c_mA;
-    short debug;
+    unsigned short debug;
 };
+// struct pc_to_hid_message {  // 4*2 = 8 bytes
+//     short current_motor_a_mA;
+//     short current_motor_b_mA;
+//     short current_motor_c_mA;
+//     short debug;
+// };
 
 //------------------------------------------------------------------------------
 
@@ -207,9 +220,14 @@ public:
 
     //! Public methods to read special info from the wooden device (for developers)
     cVector3d getTorqueSignals() { return torqueSignals; }
-    cVector3d getEncoders() { return cVector3d(incoming_msg.temperature_0,
-                                               incoming_msg.temperature_1,
-                                               incoming_msg.temperature_2);}
+    // cVector3d getEncoders() { return cVector3d(encoder_values[0],
+    //                                            encoder_values[1],
+    //                                            encoder_values[2]);}
+    cVector3d getEncoders();
+    // cVector3d getEncoders() { return cVector3d(incoming_msg.temperature_0,
+    //                                            incoming_msg.temperature_1,
+    //                                            incoming_msg.temperature_2);}
+
 
 
     //--------------------------------------------------------------------------
@@ -310,7 +328,7 @@ protected:
     std::thread t;
 
     int res;
-    unsigned char buf[9];// 1 extra byte for the report ID
+    unsigned char buf[17];// 1 extra byte for the report ID
     #define MAX_STR 255
     wchar_t wstr[MAX_STR];
     hid_device *handle;

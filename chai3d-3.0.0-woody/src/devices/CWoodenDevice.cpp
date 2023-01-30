@@ -956,7 +956,7 @@ bool cWoodenDevice::getPosition(cVector3d& a_position)
     int res=0;
     while (res == 0) {
         res = hid_read(handle, buf, sizeof(buf));
-        if(res==8) // Got a correct message
+        if(res==16) // Got a correct message
             //incoming_msg = *reinterpret_cast<woodenhaptics_message*>(buf);
             hid_to_pc = *reinterpret_cast<hid_to_pc_message*>(buf);
         usleep(10);
@@ -964,7 +964,7 @@ bool cWoodenDevice::getPosition(cVector3d& a_position)
 
     int flush=0;
     while(int res2 = hid_read(handle, buf, sizeof(buf))){
-        if(res==8) // Got a correct message
+        if(res==16) // Got a correct message
             //incoming_msg = *reinterpret_cast<woodenhaptics_message*>(buf);
             hid_to_pc = *reinterpret_cast<hid_to_pc_message*>(buf);
         ++flush;
@@ -986,6 +986,7 @@ bool cWoodenDevice::getPosition(cVector3d& a_position)
 //                                incoming_msg.temperature_1,
 //                                incoming_msg.temperature_2 };
     //double encoder_values[] = { 0,                             0, 0 };
+
     double encoder_values[] = { -hid_to_pc.encoder_a,
                                 hid_to_pc.encoder_b,
                                 hid_to_pc.encoder_c };
@@ -1301,6 +1302,7 @@ bool cWoodenDevice::setForceAndTorqueAndGripperForce(const cVector3d& a_force,
 
     // *** INSERT YOUR CODE HERE ***
 #ifdef USB
+
     double encoder_values[] = { -hid_to_pc.encoder_a,
                                 hid_to_pc.encoder_b,
                                 hid_to_pc.encoder_c };
@@ -1405,7 +1407,7 @@ bool cWoodenDevice::setForceAndTorqueAndGripperForce(const cVector3d& a_force,
                                  m_config.torque_constant_motor_b,
                                  m_config.torque_constant_motor_c };
 
-    short signalToSend[3] = {0,0,0};
+    int signalToSend[3] = {0,0,0};
     int dir[3];
     int dir_chan[3] = {16,32,64}; // DIO4, DIO5, DIO6
     int dir_sum=0;
@@ -1426,7 +1428,7 @@ bool cWoodenDevice::setForceAndTorqueAndGripperForce(const cVector3d& a_force,
         if(motorAmpere>3) motorAmpere = 3;
         if(motorAmpere<-3) motorAmpere = -3;
         // 90 % = 3 A set in microcontroller. Escon configured as 90% = 1A.
-       signalToSend[i] = short(motorAmpere*1000);
+       signalToSend[i] = int(motorAmpere*1000);
 #endif
 
 #ifdef PWM
@@ -1564,6 +1566,14 @@ bool cWoodenDevice::getUserSwitch(int a_switchIndex, bool& a_status)
     a_status = false;  // a_status = getUserSwitchOfMyDevice(a_switchIndex)
 
     return (result);
+}
+
+cVector3d cWoodenDevice::getEncoders() 
+{ 
+    return cVector3d(
+        -hid_to_pc.encoder_a,
+        hid_to_pc.encoder_b,
+        hid_to_pc.encoder_c);
 }
 
 

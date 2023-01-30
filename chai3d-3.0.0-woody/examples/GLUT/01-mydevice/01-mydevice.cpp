@@ -641,8 +641,8 @@ void updateHaptics(void)
 
         // desired position
         cVector3d desiredPosition;
-        desiredPosition.set(0.0, 0.0, 0.0);
-
+        //desiredPosition.set(0.0, 0.0, 0.0);
+        desiredPosition.set(-0.020, 0.0, .210);
         // desired orientation
         cMatrix3d desiredRotation;
         desiredRotation.identity();
@@ -656,7 +656,7 @@ void updateHaptics(void)
         if (useForceField)
         {
             // compute linear force
-            double Kp = 500; // [N/m]
+            double Kp = 10; // [N/m]
             cVector3d forceField = Kp * (desiredPosition - position);
             force.add(forceField);
 
@@ -698,6 +698,7 @@ void updateHaptics(void)
 
         hapticDeviceForce = force;
         if(cWoodenDevice* w = dynamic_cast<cWoodenDevice*>(hapticDevice.get())){
+            //printf("Size of struct: %ld", sizeof(struct hid_to_pc_message));
             hapticDeviceTorqueSignal = w->getTorqueSignals();
             hapticDeviceEncoders = w->getEncoders();
             hapticDeviceLostMessages = w->lost_messages;
